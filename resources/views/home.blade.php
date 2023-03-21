@@ -12,7 +12,16 @@
 
         
     </head>
-    <body class="antialiased">
-        HI
+    <body >
+        @forelse($results as $result)
+                <div>
+                    {{$result['date']}} {{$result['size']}} {{$result['provider']}} {{$result['price']}} {{$result['discount']}} 
+                    @if($result['size'] == null)
+                    {{$result['status']}}
+                    @endif
+                </div>
+        @empty
+        <li class="list-group-item">No books found</li>
+        @endforelse
     </body>
 </html>
