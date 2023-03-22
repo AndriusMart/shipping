@@ -17,6 +17,7 @@ class ShipmentController extends Controller
     }
     public function index(Request $request)
     {
+
         $result = $this->myService->parseInputFile(Storage::path('input.txt'));
         return view('home', [
             'results' => $result,

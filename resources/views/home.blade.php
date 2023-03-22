@@ -16,7 +16,7 @@
         @forelse($results as $result)
                 <div>
                     {{$result['date']}} {{$result['size']}} {{$result['provider']}} {{$result['price']}} {{$result['discount']}} 
-                    @if($result['size'] == null)
+                    @if($result['status'] == 'Ignored')
                     {{$result['status']}}
                     @endif
                 </div>

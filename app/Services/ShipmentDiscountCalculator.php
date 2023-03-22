@@ -8,19 +8,41 @@ class ShipmentDiscountCalculator
 {
     public function parseInputFile($inputFilePath)
     {
-        $inputFilePath = Storage::path('input.txt');
         $lines = file($inputFilePath, FILE_IGNORE_NEW_LINES);
 
         $parsedData = [];
-
+        $shipmentData = config("shipment");
         foreach ($lines as $line) {
             $parts = explode(' ', $line);
-
-            if (count($parts) != 3) {
+            if (count($parts) < 3) {
+                if (count($parts) == 1 ) {
+                    $parsedData[] = [
+                        'date' => $parts[0],
+                        'size' => null,
+                        'provider' => null,
+                        'price' => null,
+                        'discount' => '-',
+                        'status' => 'Ignored',
+                    ];
+                    continue;
+                }
+                if (count($parts) == 2 ) {
+                    $parsedData[] = [
+                        'date' => $parts[0],
+                        'size' => $parts[1],
+                        'provider' => null,
+                        'price' => null,
+                        'discount' => '-',
+                        'status' => 'Ignored',
+                    ];
+                    continue;
+                }
+            }
+            if (!in_array($parts[1], $shipmentData['sizes']) || !in_array($parts[2], $shipmentData['providers'])) {
                 $parsedData[] = [
                     'date' => $parts[0],
-                    'size' => null,
-                    'provider' => $parts[1],
+                    'size' => $parts[1],
+                    'provider' => $parts[2],
                     'price' => null,
                     'discount' => '-',
                     'status' => 'Ignored',
@@ -53,19 +75,22 @@ class ShipmentDiscountCalculator
         $PricesOfS = array_column(config('shipment.prices'), 'S');
         $lowestPrice = min($PricesOfS);
         $currentMonth = null;
+        $currentYear = null;
         foreach ($parsedData as &$data) {
             if ($data['status'] == 'Ignored') {
                 continue;
             }
             $month = date('m', strtotime($data['date']));
+            $year =date('Y', strtotime($data['date']));
             $size = $data['size'];
             $provider = $data['provider'];
             $price = $data['price'];
 
-            if ($currentMonth !== $month) {
+            if ($currentMonth !== $month || $currentYear !==$year) {
                 $discount = 10;
                 $lpLShipmentsThisMonth = 0;
                 $currentMonth = $month;
+                $currentYear = $year;
             }
 
             switch ($size) {
@@ -100,7 +125,6 @@ class ShipmentDiscountCalculator
 
             $data['price'] = number_format($price, 2) . ' €';
         }
-
         return $parsedData;
     }
     public function storeToFile($result){

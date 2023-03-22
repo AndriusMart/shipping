@@ -4,7 +4,6 @@ return [
     'providers' => [
         'LP' => 'LP',
         'MR' => 'MR',
-        'CUSPS' => 'CUSPS',
     ],
 
     'sizes' => [
